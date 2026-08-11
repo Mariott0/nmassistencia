@@ -1,0 +1,19 @@
+# Local instructions and integration scripts
+README.MD
+README.md
+google-apps-script.gs
+google-apps-script*.gs
+
+# Local environment / secrets
+.env
+.env.*
+!.env.example
+credentials*.json
+secrets*.json
+*.key
+*.pem
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
