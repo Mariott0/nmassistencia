@@ -1748,12 +1748,12 @@
                     </div>
                     <div class="form-grid">
                         <div class="field full">
-                            <label for="scriptUrl">URL do Web App do Google Apps Script</label>
-                            <input id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+                            <label for="scriptUrl">Planilha padrão da NM Assistência</label>
+                            <input id="scriptUrl" readonly>
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button class="primary-button" type="button" id="saveSettings"><i class="fa-solid fa-check"></i> Salvar conexão</button>
+                        <button class="primary-button" type="button" id="saveSettings"><i class="fa-solid fa-check"></i> Usar conexão fixa</button>
                         <button class="ghost-button" type="button" id="testConnection"><i class="fa-solid fa-plug-circle-check"></i> Testar</button>
                         <button class="ghost-button" type="button" id="syncButton"><i class="fa-solid fa-cloud-arrow-up"></i> Enviar registros</button>
                         <button class="ghost-button" type="button" id="loadSheetsButton"><i class="fa-solid fa-cloud-arrow-down"></i> Puxar planilha</button>
@@ -1783,6 +1783,8 @@
             settings: "nmassistencia.settings"
         };
 
+        const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyuvf6unW50_c7UrRFp7GieWK1lpHSGxUBjktG8CXG6jmwTSrJi5mEOMWfRkPOExx6W/exec";
+
         const HEADERS = [
             "id", "createdAt", "updatedAt", "tipo", "status", "cliente", "telefone",
             "equipamento", "serie", "problema", "diagnostico", "servico", "pecas",
@@ -1808,7 +1810,7 @@
 
         const state = {
             records: loadJson(STORAGE_KEYS.records, []),
-            settings: loadJson(STORAGE_KEYS.settings, { scriptUrl: "", lastSync: "" }),
+            settings: normalizeSettings(loadJson(STORAGE_KEYS.settings, {})),
             toastTimer: null
         };
 
@@ -1849,11 +1851,20 @@
             }
         }
 
+        function normalizeSettings(settings) {
+            return {
+                ...settings,
+                scriptUrl: DEFAULT_SCRIPT_URL,
+                lastSync: settings?.lastSync || ""
+            };
+        }
+
         function saveRecords() {
             localStorage.setItem(STORAGE_KEYS.records, JSON.stringify(state.records));
         }
 
         function saveSettings() {
+            state.settings = normalizeSettings(state.settings);
             localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
         }
 
@@ -2219,11 +2230,12 @@
         }
 
         function renderSettings() {
-            $("#scriptUrl").value = state.settings.scriptUrl || "";
+            state.settings = normalizeSettings(state.settings);
+            $("#scriptUrl").value = getScriptUrl();
             $("#localCount").textContent = state.records.length;
             $("#pendingCount").textContent = state.records.filter((record) => record.pendingSync).length;
             $("#lastSync").textContent = formatDateTime(state.settings.lastSync);
-            const connected = Boolean(state.settings.scriptUrl);
+            const connected = Boolean(getScriptUrl());
             $("#sheetStatus").textContent = connected ? "Planilhas configurado" : "Banco local";
             $("#sheetPill").classList.toggle("connected", connected);
         }
@@ -2317,7 +2329,7 @@
             state.records = state.records.filter((item) => item.id !== id);
             saveRecords();
             renderAll();
-            if (state.settings.scriptUrl) {
+            if (getScriptUrl()) {
                 try {
                     await postToSheets("delete", { id });
                 } catch {
@@ -2350,7 +2362,7 @@
         }
 
         function getScriptUrl() {
-            return (state.settings.scriptUrl || "").trim();
+            return DEFAULT_SCRIPT_URL;
         }
 
         function sheetsJsonp(action, params = {}) {
@@ -2435,7 +2447,7 @@
         }
 
         async function syncSingle(record) {
-            if (!state.settings.scriptUrl) return;
+            if (!getScriptUrl()) return;
             await postToSheets("upsert", stripLocalFields(record));
             state.records = state.records.map((item) => (
                 item.id === record.id ? { ...item, pendingSync: false } : item
@@ -2512,7 +2524,7 @@
                 showToast("Registro salvo.");
 
                 if (event.submitter?.dataset.sync === "true") {
-                    if (!state.settings.scriptUrl) {
+                    if (!getScriptUrl()) {
                         showToast("Salvo localmente. Configure a planilha para sincronizar.");
                         return;
                     }
@@ -2557,14 +2569,14 @@
             });
 
             $("#saveSettings").addEventListener("click", () => {
-                state.settings.scriptUrl = $("#scriptUrl").value.trim();
+                state.settings.scriptUrl = DEFAULT_SCRIPT_URL;
                 saveSettings();
                 renderSettings();
-                showToast("Conexão salva.");
+                showToast("Conexão fixa ativada.");
             });
 
             $("#testConnection").addEventListener("click", async () => {
-                state.settings.scriptUrl = $("#scriptUrl").value.trim();
+                state.settings.scriptUrl = DEFAULT_SCRIPT_URL;
                 saveSettings();
                 renderSettings();
                 await testConnection();
