@@ -7,7 +7,7 @@ O projeto foi desenvolvido para rodar como site estático no **GitHub Pages**, c
 ## Acesso
 
 ```text
-https://assistecia.nathanmariotto.com.br
+assistencia.nathanmariotto.com.br
 ```
 
 ## Funcionalidades
