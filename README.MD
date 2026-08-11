@@ -1,121 +1,62 @@
-# 🛠️ NM Assistência — Sistema de Gestão de Serviços
+# NM Assistência | Gestão Técnica
 
-Sistema web desenvolvido para a **NM Assistência**, com o objetivo de **gerenciar serviços técnicos**, clientes e pagamentos de forma simples, moderna e eficiente.
+Sistema web para gestão de assistência técnica da **NM Assistência**, focado em orçamentos, ordens de serviço, histórico de atendimentos e controle financeiro.
 
-O projeto foi pensado para uso real no dia a dia da assistência, com foco em **UI/UX profissional**, **performance** e **escala futura**.
+O projeto foi desenvolvido para rodar como site estático no **GitHub Pages**, com interface responsiva e integração externa com Google Planilhas para persistência dos registros.
 
----
+## Acesso
 
-## 🚀 Funcionalidades
-
-* ✅ Cadastro de clientes
-* ✅ Registro de serviços realizados
-* ✅ Armazenamento de telefone, endereço e observações
-* ✅ Registro de data, hora e valor do serviço
-* ✅ Histórico completo de serviços
-* ✅ Exclusão de registros
-* ✅ Interface responsiva (desktop e mobile)
-* ✅ Animações suaves com **GSAP**
-* ✅ Integração com **Supabase (PostgreSQL)**
-
----
-
-## 🎨 UI / UX
-
-O layout segue uma identidade visual profissional utilizando:
-
-* 🔵 Azul escuro
-* ⚫ Preto
-* ⚪ Branco
-
-Além disso, são aplicadas animações com **GSAP** para melhorar a experiência do usuário sem comprometer a performance.
-
----
-
-## 🧰 Tecnologias Utilizadas
-
-* **HTML5**
-* **CSS3** (layout responsivo e moderno)
-* **JavaScript (Vanilla)**
-* **GSAP** (animações)
-* **Supabase**
-
-  * PostgreSQL
-  * API REST automática
-  * Auth (futuro)
-
----
-
-## 🗄️ Estrutura do Banco de Dados (Supabase)
-
-### 📁 Tabela `clientes`
-
-| Campo      | Tipo      |
-| ---------- | --------- |
-| id         | uuid (PK) |
-| nome       | text      |
-| telefone   | text      |
-| endereco   | text      |
-| created_at | timestamp |
-
-### 📁 Tabela `servicos`
-
-| Campo        | Tipo      |
-| ------------ | --------- |
-| id           | uuid (PK) |
-| cliente_id   | uuid (FK) |
-| descricao    | text      |
-| observacao   | text      |
-| data_servico | timestamp |
-| valor        | numeric   |
-| created_at   | timestamp |
-
----
-
-## ⚙️ Como Executar o Projeto
-
-1. Clone o repositório:
-
-```bash
-git clone https://github.com/seu-usuario/nm-assistencia.git
+```text
+https://assistecia.nathanmariotto.com.br
 ```
 
-2. Abra o arquivo `index.html` no navegador
+## Funcionalidades
 
-> 💡 O sistema funciona 100% no navegador e se conecta diretamente ao Supabase.
+- Cadastro de orçamentos e ordens de serviço
+- Geração de mensagem pronta para envio ao cliente pelo WhatsApp
+- Histórico com busca, filtros, edição, duplicação e exclusão
+- Cálculo automático de valor bruto, gastos, lucro previsto e margem
+- Controle de valores recebidos e valores em aberto
+- Exportação dos registros em CSV
+- Interface responsiva para desktop e mobile
+- Integração com planilha externa já preparada para uso do sistema
 
----
+## Tecnologias
 
-## 🔐 Segurança
+- HTML5
+- CSS3
+- JavaScript vanilla
+- Font Awesome
+- Google Fonts
+- GitHub Pages
+- Google Planilhas via camada externa de integração
 
-* Utiliza **Row Level Security (RLS)** no Supabase
-* Preparado para autenticação por usuário (admin)
-* Chave pública utilizada apenas para operações permitidas
+## Estrutura
 
----
+```text
+.
+├── index.html
+├── CNAME
+├── .gitignore
+└── midia.nmassistecia/
+```
 
-## 📈 Evoluções Futuras
+## Design
 
-* 🔐 Sistema de login
-* 🔍 Busca e filtros por cliente e data
-* 📊 Relatórios financeiros
-* 📄 Exportação em PDF / Excel
-* 📱 Versão mobile (React Native)
-* ☁️ Backup e multiusuário
+A interface usa a identidade visual da NM Assistência, com base em tons escuros, azul tecnológico, branco e elementos visuais da marca.
 
----
+As principais decisões de UI foram:
 
-## 👨‍💻 Autor
+- painel inicial direto e minimalista
+- foco em ações rápidas de atendimento
+- indicadores financeiros visíveis
+- formulários organizados por fluxo de trabalho
+- histórico pensado para consulta no dia a dia
 
-**Nathan Mariotto**
-Desenvolvedor Full Stack
-📍 Paraná — Brasil
+## Segurança
 
-Projeto desenvolvido para uso real na **NM Assistência**.
+Informações internas de integração, scripts locais, credenciais e arquivos sensíveis não fazem parte do repositório público.
 
----
+## Autor
 
-## 📄 Licença
-
-Este projeto é de uso privado da **NM Assistência**.
-Todos os direitos reservados.
+Projeto desenvolvido por **Nathan Mariotto** para uso operacional da **NM Assistência Técnica**.

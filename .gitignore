@@ -1,6 +1,6 @@
 # Local instructions and integration scripts
-README.MD
-README.md
+README.local.md
+README.private.md
 google-apps-script.gs
 google-apps-script*.gs
 
