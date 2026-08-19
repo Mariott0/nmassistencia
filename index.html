@@ -1783,10 +1783,17 @@
       html[data-theme="light"] .pipeline-item,
       html[data-theme="light"] .recent-card,
       html[data-theme="light"] .status-line,
-      html[data-theme="light"] .filters {
+      html[data-theme="light"] .filters,
+      html[data-theme="light"] .dashboard-toolbar {
         color: #253447;
         background: rgba(15, 32, 48, 0.045);
         border-color: rgba(15, 32, 48, 0.09);
+      }
+
+      html[data-theme="light"] .period-control {
+        color: #253447;
+        background: rgba(255, 255, 255, 0.76);
+        border-color: rgba(15, 32, 48, 0.1);
       }
 
       html[data-theme="light"] .hero-media {
@@ -1905,6 +1912,61 @@
       .metrics-grid {
         grid-template-columns: repeat(4, minmax(190px, 1fr));
         gap: 12px;
+      }
+
+      .dashboard-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-top: 16px;
+        padding: 14px;
+        background: rgba(17, 24, 32, 0.88);
+        border: 1px solid rgba(226, 235, 246, 0.12);
+        border-radius: var(--radius);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+      }
+
+      .dashboard-toolbar span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .dashboard-toolbar strong {
+        display: block;
+        margin-top: 2px;
+        color: var(--text);
+        font-family: var(--font-display);
+        font-size: 1rem;
+      }
+
+      .period-control {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: min(100%, 240px);
+        min-height: 44px;
+        padding: 0 12px;
+        color: var(--muted-strong);
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid rgba(226, 235, 246, 0.13);
+        border-radius: 7px;
+      }
+
+      .period-control i {
+        color: var(--cyan);
+      }
+
+      .period-control select {
+        min-height: 42px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        cursor: pointer;
       }
 
       .metric {
@@ -2118,6 +2180,16 @@
         .form-grid,
         .filters {
           grid-template-columns: 1fr;
+        }
+
+        .dashboard-toolbar {
+          align-items: stretch;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .period-control {
+          width: 100%;
         }
 
         .pipeline-item {
@@ -2490,6 +2562,21 @@
               <span>Toledo - PR</span>
             </div>
           </div>
+        </div>
+
+        <div class="dashboard-toolbar" aria-label="Filtro do painel">
+          <div>
+            <span>Período do dashboard</span>
+            <strong id="dashboardPeriodHint">Mês atual</strong>
+          </div>
+          <label class="period-control" for="dashboardPeriod">
+            <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+            <select id="dashboardPeriod">
+              <option value="month" selected>Mês atual</option>
+              <option value="30">Últimos 30 dias</option>
+              <option value="all">Todos os períodos</option>
+            </select>
+          </label>
         </div>
 
         <div class="metrics-grid" aria-label="Indicadores financeiros">
@@ -3294,8 +3381,41 @@
         return state.records.filter((record) => record.status !== "Cancelado");
       }
 
+      function getRecordReferenceDate(record) {
+        const dateOnly =
+          record.dataEntrada || record.createdAt?.slice(0, 10) || today();
+        const reference = new Date(`${dateOnly}T00:00:00`);
+        return Number.isNaN(reference.getTime()) ? new Date() : reference;
+      }
+
+      function getDashboardPeriodLabel(period) {
+        if (period === "30") return "Últimos 30 dias";
+        if (period === "all") return "Todos os períodos";
+        return "Mês atual";
+      }
+
+      function getDashboardRecords() {
+        const period = $("#dashboardPeriod").value || "month";
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const last30 = new Date(now);
+        last30.setDate(now.getDate() - 30);
+
+        $("#dashboardPeriodHint").textContent = getDashboardPeriodLabel(period);
+
+        return state.records.filter((record) => {
+          const reference = getRecordReferenceDate(record);
+          if (period === "all") return true;
+          if (period === "30") return reference >= last30;
+          return reference >= startOfMonth;
+        });
+      }
+
       function renderDashboard() {
-        const active = getActiveRecords();
+        const periodRecords = getDashboardRecords();
+        const active = periodRecords.filter(
+          (record) => record.status !== "Cancelado",
+        );
         const totals = active.reduce(
           (acc, record) => {
             const recordTotals = getTotals(record);
@@ -3317,18 +3437,16 @@
         $("#openMetric").textContent = formatCurrency(openValue);
         $("#grossHint").textContent = `${active.length} registros ativos`;
         $("#profitHint").textContent = `Margem ${Math.round(margin)}%`;
-        $("#totalBadge").textContent = `${state.records.length} registros`;
+        $("#totalBadge").textContent = `${periodRecords.length} registros`;
 
-        renderPipeline();
-        renderRecent();
+        renderPipeline(periodRecords);
+        renderRecent(periodRecords);
       }
 
-      function renderPipeline() {
-        const total = Math.max(1, state.records.length);
+      function renderPipeline(records = state.records) {
+        const total = Math.max(1, records.length);
         $("#pipelineList").innerHTML = STATUS_ORDER.map((status) => {
-          const count = state.records.filter(
-            (record) => record.status === status,
-          ).length;
+          const count = records.filter((record) => record.status === status).length;
           const width = Math.max(4, (count / total) * 100);
           return `
                     <div class="pipeline-item">
@@ -3340,8 +3458,8 @@
         }).join("");
       }
 
-      function renderRecent() {
-        const recent = [...state.records]
+      function renderRecent(records = state.records) {
+        const recent = [...records]
           .sort((a, b) =>
             String(b.updatedAt).localeCompare(String(a.updatedAt)),
           )
@@ -3938,6 +4056,7 @@
           const nextTheme = getCurrentTheme() === "light" ? "dark" : "light";
           applyTheme(nextTheme);
         });
+        $("#dashboardPeriod").addEventListener("change", renderDashboard);
         $("#exportButton").addEventListener("click", exportCsv);
 
         $("#searchRecords").addEventListener("input", renderRecords);
@@ -3986,6 +4105,7 @@
 
       function init() {
         applyTheme(getCurrentTheme(), false);
+        $("#dashboardPeriod").value = "month";
         fillForm(null);
         setupEvents();
         renderAll();
