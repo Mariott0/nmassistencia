@@ -8,7 +8,7 @@
       name="description"
       content="Sistema de gestão de orçamentos, ordens de serviço e resultados financeiros da NM Assistência Técnica."
     />
-    <meta name="theme-color" content="#05080e" />
+    <meta id="themeColorMeta" name="theme-color" content="#05080e" />
     <link
       rel="icon"
       type="image/png"
@@ -31,6 +31,18 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     />
+    <script>
+      try {
+        const savedTheme = localStorage.getItem("nmassistencia.theme");
+        const prefersLight = window.matchMedia(
+          "(prefers-color-scheme: light)",
+        ).matches;
+        document.documentElement.dataset.theme =
+          savedTheme || (prefersLight ? "light" : "dark");
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
     <style>
       :root {
         --bg: #05070d;
@@ -1540,9 +1552,859 @@
           width: min(210px, 78%);
         }
       }
+
+      /* Redesign 2026: operational UI with stronger hierarchy and denser workflows. */
+      :root {
+        --bg: #080b10;
+        --panel: #111820;
+        --panel-strong: #17212c;
+        --surface: rgba(17, 24, 32, 0.94);
+        --surface-soft: rgba(255, 255, 255, 0.052);
+        --line: #2a3746;
+        --line-soft: rgba(226, 235, 246, 0.12);
+        --text: #f8fafc;
+        --muted: #93a4b7;
+        --muted-strong: #d7e0eb;
+        --blue: #1988ff;
+        --blue-strong: #0865d8;
+        --cyan: #2cc9d6;
+        --green: #3dd087;
+        --amber: #f2b84b;
+        --red: #fb6574;
+        --shadow: 0 18px 54px rgba(0, 0, 0, 0.28);
+      }
+
+      body {
+        background:
+          linear-gradient(180deg, rgba(8, 11, 16, 0.84), #080b10 360px),
+          linear-gradient(115deg, rgba(25, 136, 255, 0.12), transparent 38%),
+          url("midia.nmassistecia/banner2.jpeg") top center / min(100%, 1500px)
+            auto no-repeat,
+          var(--bg);
+      }
+
+      body::after {
+        opacity: 0.55;
+      }
+
+      .topbar,
+      .app-shell {
+        width: min(1360px, calc(100% - 32px));
+      }
+
+      .topbar {
+        padding-top: 12px;
+      }
+
+      .topbar-inner {
+        grid-template-columns: minmax(220px, 1fr) auto auto;
+        padding: 8px 10px;
+        background: rgba(10, 14, 20, 0.88);
+        border-color: rgba(226, 235, 246, 0.13);
+      }
+
+      .brand img {
+        width: 44px;
+        height: 44px;
+      }
+
+      .brand strong {
+        font-size: 1rem;
+      }
+
+      .brand span {
+        font-size: 0.76rem;
+      }
+
+      .nav {
+        justify-self: end;
+      }
+
+      .topbar-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 0 13px;
+        color: var(--muted-strong);
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid rgba(226, 235, 246, 0.13);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.88rem;
+        font-weight: 800;
+        transition:
+          background 160ms ease,
+          border-color 160ms ease,
+          color 160ms ease,
+          transform 160ms ease;
+      }
+
+      .theme-toggle:hover {
+        color: var(--text);
+        background: rgba(25, 136, 255, 0.12);
+        border-color: rgba(44, 201, 214, 0.34);
+      }
+
+      .theme-toggle:active {
+        transform: translateY(1px);
+      }
+
+      .theme-toggle i {
+        color: var(--cyan);
+      }
+
+      .nav button,
+      .ghost-button,
+      .icon-button,
+      .primary-button,
+      .danger-button {
+        min-height: 40px;
+        border-radius: 6px;
+        font-size: 0.88rem;
+      }
+
+      .nav button {
+        padding: 0 14px;
+      }
+
+      .nav button.active {
+        background: #f8fafc;
+        color: #0b1118;
+      }
+
+      .nav button.active i {
+        color: var(--blue-strong);
+      }
+
+      [data-sync="true"],
+      #sheetPill {
+        display: none !important;
+      }
+
+      html[data-theme="light"] {
+        color-scheme: light;
+        --bg: #eef3f8;
+        --panel: #ffffff;
+        --panel-strong: #f7fafc;
+        --surface: rgba(255, 255, 255, 0.94);
+        --surface-soft: rgba(9, 20, 32, 0.045);
+        --line: #cbd6e2;
+        --line-soft: rgba(9, 20, 32, 0.1);
+        --text: #0e1721;
+        --muted: #637489;
+        --muted-strong: #253447;
+        --blue: #096fdc;
+        --blue-strong: #0757ba;
+        --cyan: #08899a;
+        --green: #138a55;
+        --amber: #a76512;
+        --red: #c93649;
+        --shadow: 0 18px 42px rgba(15, 32, 48, 0.12);
+      }
+
+      html[data-theme="light"] body {
+        background:
+          linear-gradient(180deg, rgba(238, 243, 248, 0.88), #eef3f8 360px),
+          linear-gradient(115deg, rgba(9, 111, 220, 0.12), transparent 42%),
+          url("midia.nmassistecia/banner2.jpeg") top center / min(100%, 1500px)
+            auto no-repeat,
+          var(--bg);
+      }
+
+      html[data-theme="light"] body::after {
+        opacity: 0.26;
+      }
+
+      html[data-theme="light"] .topbar-inner {
+        background: rgba(255, 255, 255, 0.88);
+        border-color: rgba(15, 32, 48, 0.12);
+      }
+
+      html[data-theme="light"] .brand span,
+      html[data-theme="light"] .metric small,
+      html[data-theme="light"] .recent-card span {
+        color: #64748b;
+      }
+
+      html[data-theme="light"] .nav {
+        background: rgba(15, 32, 48, 0.055);
+        border-color: rgba(15, 32, 48, 0.11);
+      }
+
+      html[data-theme="light"] .nav button,
+      html[data-theme="light"] .theme-toggle {
+        color: #334155;
+        background: rgba(255, 255, 255, 0.68);
+        border-color: rgba(15, 32, 48, 0.1);
+      }
+
+      html[data-theme="light"] .nav button.active {
+        color: #ffffff;
+        background: var(--blue);
+      }
+
+      html[data-theme="light"] .nav button.active i {
+        color: #ffffff;
+      }
+
+      html[data-theme="light"] .theme-toggle:hover,
+      html[data-theme="light"] .ghost-button:hover,
+      html[data-theme="light"] .icon-button:hover {
+        color: #0e1721;
+        background: rgba(9, 111, 220, 0.08);
+        border-color: rgba(9, 111, 220, 0.24);
+      }
+
+      html[data-theme="light"] .hero-panel,
+      html[data-theme="light"] .panel,
+      html[data-theme="light"] .metric {
+        background: rgba(255, 255, 255, 0.94);
+        border-color: rgba(15, 32, 48, 0.1);
+      }
+
+      html[data-theme="light"] .hero-copy .hero-lead,
+      html[data-theme="light"] .summary-row,
+      html[data-theme="light"] td {
+        color: #334155;
+      }
+
+      html[data-theme="light"] .hero-kicker {
+        color: #0757ba;
+      }
+
+      html[data-theme="light"] .hero-tags span,
+      html[data-theme="light"] .pipeline-item,
+      html[data-theme="light"] .recent-card,
+      html[data-theme="light"] .status-line,
+      html[data-theme="light"] .filters {
+        color: #253447;
+        background: rgba(15, 32, 48, 0.045);
+        border-color: rgba(15, 32, 48, 0.09);
+      }
+
+      html[data-theme="light"] .hero-media {
+        box-shadow: inset 28px 0 52px rgba(255, 255, 255, 0.28);
+      }
+
+      html[data-theme="light"] .hero-logo-card {
+        background: rgba(255, 255, 255, 0.78);
+        border-color: rgba(15, 32, 48, 0.12);
+      }
+
+      html[data-theme="light"] input,
+      html[data-theme="light"] select,
+      html[data-theme="light"] textarea {
+        color: #0e1721;
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(15, 32, 48, 0.14);
+      }
+
+      html[data-theme="light"] input::placeholder,
+      html[data-theme="light"] textarea::placeholder {
+        color: #7b8a9d;
+      }
+
+      html[data-theme="light"] th {
+        color: #475569;
+        background: #eef3f8;
+      }
+
+      html[data-theme="light"] tbody tr:hover {
+        background: rgba(9, 111, 220, 0.055);
+      }
+
+      html[data-theme="light"] .ghost-button,
+      html[data-theme="light"] .icon-button {
+        color: #253447;
+        background: rgba(15, 32, 48, 0.055);
+        border-color: rgba(15, 32, 48, 0.1);
+      }
+
+      html[data-theme="light"] .toast {
+        color: #0e1721;
+        background: #ffffff;
+        border-color: rgba(9, 111, 220, 0.28);
+      }
+
+      .hero-panel {
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.36fr);
+        min-height: 286px;
+        border: 1px solid rgba(226, 235, 246, 0.14);
+        background:
+          linear-gradient(135deg, rgba(19, 29, 39, 0.98), rgba(9, 13, 19, 0.98)),
+          var(--panel);
+      }
+
+      .hero-panel::before {
+        width: 3px;
+        background: linear-gradient(180deg, var(--green), var(--cyan), var(--blue));
+      }
+
+      .hero-copy {
+        padding: clamp(24px, 3.4vw, 40px);
+      }
+
+      .hero-kicker {
+        margin-bottom: 14px;
+        color: #9de8ee;
+        letter-spacing: 0.08em;
+      }
+
+      .hero-copy h1 {
+        max-width: 680px;
+        font-size: clamp(2rem, 3.8vw, 4rem);
+        line-height: 1.02;
+      }
+
+      .hero-copy .hero-lead {
+        max-width: 660px;
+        color: #d7e0eb;
+        font-size: 1rem;
+      }
+
+      .hero-tags {
+        margin-top: 18px;
+      }
+
+      .hero-tags span {
+        min-height: 28px;
+        color: #e5edf6;
+        background: rgba(226, 235, 246, 0.075);
+        border-color: rgba(226, 235, 246, 0.14);
+      }
+
+      .hero-actions {
+        margin-top: 22px;
+      }
+
+      .hero-media {
+        min-height: 286px;
+        background:
+          linear-gradient(90deg, rgba(8, 11, 16, 0.35), rgba(8, 11, 16, 0.04)),
+          url("midia.nmassistecia/cartao.jpeg") center / cover no-repeat;
+      }
+
+      .hero-logo-card {
+        width: min(208px, 78%);
+        padding: 18px 16px;
+        background: rgba(8, 11, 16, 0.74);
+      }
+
+      .hero-logo-card img {
+        width: 92px;
+        height: 92px;
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(4, minmax(190px, 1fr));
+        gap: 12px;
+      }
+
+      .metric {
+        min-height: 116px;
+        padding: 16px;
+        background: rgba(17, 24, 32, 0.92);
+      }
+
+      .metric strong {
+        font-size: clamp(1.4rem, 2.1vw, 2.08rem);
+      }
+
+      .grid-two {
+        grid-template-columns: minmax(330px, 0.9fr) minmax(0, 1.1fr);
+      }
+
+      .panel {
+        padding: 18px;
+        border-color: rgba(226, 235, 246, 0.12);
+        background: rgba(17, 24, 32, 0.92);
+      }
+
+      .panel-header {
+        align-items: flex-start;
+      }
+
+      .panel-header h2 {
+        margin-bottom: 0;
+      }
+
+      .form-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(340px, 0.34fr);
+      }
+
+      .form-grid {
+        gap: 14px;
+      }
+
+      .field {
+        gap: 7px;
+      }
+
+      label {
+        color: #dbe4ef;
+        font-size: 0.8rem;
+      }
+
+      input,
+      select,
+      textarea {
+        border-radius: 6px;
+        background: rgba(7, 11, 16, 0.78);
+      }
+
+      input,
+      select {
+        min-height: 42px;
+      }
+
+      textarea {
+        min-height: 92px;
+      }
+
+      .quote-summary {
+        top: 82px;
+      }
+
+      .summary-row {
+        align-items: center;
+      }
+
+      .summary-row.total strong {
+        font-size: 1.12rem;
+      }
+
+      .message-box {
+        min-height: 254px;
+      }
+
+      .filters {
+        grid-template-columns: minmax(260px, 1fr) 190px 170px auto;
+        align-items: end;
+      }
+
+      .records-table-wrap {
+        border-radius: 7px;
+      }
+
+      table {
+        min-width: 1040px;
+      }
+
+      th,
+      td {
+        padding: 11px 12px;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+
+      .row-actions {
+        justify-content: flex-end;
+      }
+
+      .icon-button {
+        width: 36px;
+        min-height: 36px;
+      }
+
+      .badge {
+        border-radius: 999px;
+      }
+
+      .empty-state {
+        min-height: 150px;
+      }
+
+      @media (max-width: 1120px) {
+        .topbar-inner,
+        .hero-panel,
+        .form-layout,
+        .grid-two {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          justify-self: stretch;
+        }
+
+        .topbar-actions {
+          justify-content: stretch;
+        }
+
+        .theme-toggle {
+          width: 100%;
+        }
+
+        .hero-media {
+          min-height: 220px;
+          background-position: center 58%;
+        }
+
+        .quote-summary {
+          position: static;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .metrics-grid,
+        .filters {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .filters .field:first-child,
+        #clearFilters {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .topbar,
+        .app-shell {
+          width: min(100% - 18px, 1360px);
+        }
+
+        .topbar-inner {
+          padding: 9px;
+        }
+
+        .brand img {
+          width: 40px;
+          height: 40px;
+        }
+
+        .nav {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          width: 100%;
+        }
+
+        .nav button {
+          min-width: 0;
+          padding: 0 8px;
+          font-size: 0.8rem;
+        }
+
+        .nav button i {
+          margin-right: 0;
+        }
+
+        .hero-copy,
+        .panel {
+          padding: 15px;
+        }
+
+        .hero-copy h1 {
+          font-size: clamp(1.9rem, 11vw, 3rem);
+        }
+
+        .hero-tags span,
+        .hero-actions > *,
+        .form-actions > *,
+        .toolbar > * {
+          flex: 1 1 100%;
+        }
+
+        .metrics-grid,
+        .form-grid,
+        .filters {
+          grid-template-columns: 1fr;
+        }
+
+        .pipeline-item {
+          grid-template-columns: 112px minmax(0, 1fr) 28px;
+        }
+
+        .recent-card {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .skip-link {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 120;
+        padding: 10px 12px;
+        color: #ffffff;
+        background: var(--blue-strong);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        transform: translateY(-160%);
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible,
+      a:focus-visible {
+        outline: 3px solid rgba(44, 201, 214, 0.7);
+        outline-offset: 3px;
+      }
+
+      #serviceForm {
+        overflow: hidden;
+      }
+
+      .form-section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 38px;
+        margin-top: 8px;
+        padding: 10px 12px;
+        color: #dfe9f5;
+        background:
+          linear-gradient(90deg, rgba(44, 201, 214, 0.12), transparent),
+          rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(226, 235, 246, 0.1);
+        border-radius: 7px;
+        font-family: var(--font-display);
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      .form-section-title:first-child {
+        margin-top: 0;
+      }
+
+      .form-section-title i {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        color: var(--cyan);
+        background: rgba(44, 201, 214, 0.11);
+        border: 1px solid rgba(44, 201, 214, 0.18);
+        border-radius: 6px;
+      }
+
+      #serviceForm .field {
+        min-width: 0;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.032);
+        border: 1px solid rgba(226, 235, 246, 0.075);
+        border-radius: 7px;
+      }
+
+      #serviceForm .field:focus-within {
+        border-color: rgba(44, 201, 214, 0.3);
+        background: rgba(44, 201, 214, 0.045);
+      }
+
+      #serviceForm label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      #serviceForm .field:has(:required) label::after {
+        color: var(--cyan);
+        content: "Obrigatório";
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      #serviceForm input,
+      #serviceForm select,
+      #serviceForm textarea {
+        min-height: 46px;
+        font-size: 1rem;
+      }
+
+      #serviceForm textarea {
+        min-height: 108px;
+      }
+
+      .quote-summary .panel:first-child {
+        border-color: rgba(61, 208, 135, 0.2);
+      }
+
+      .summary-row.total:last-child {
+        padding: 13px 12px;
+        background: rgba(61, 208, 135, 0.08);
+        border: 1px solid rgba(61, 208, 135, 0.16);
+        border-radius: 7px;
+      }
+
+      .message-box {
+        font-size: 0.95rem;
+      }
+
+      html[data-theme="light"] .form-section-title {
+        color: #172033;
+        background:
+          linear-gradient(90deg, rgba(9, 111, 220, 0.08), transparent),
+          rgba(15, 32, 48, 0.035);
+        border-color: rgba(15, 32, 48, 0.09);
+      }
+
+      html[data-theme="light"] #serviceForm .field {
+        background: rgba(15, 32, 48, 0.025);
+        border-color: rgba(15, 32, 48, 0.075);
+      }
+
+      html[data-theme="light"] #serviceForm .field:focus-within {
+        background: rgba(9, 111, 220, 0.045);
+        border-color: rgba(9, 111, 220, 0.24);
+      }
+
+      html[data-theme="light"] .summary-row.total:last-child {
+        background: rgba(19, 138, 85, 0.08);
+        border-color: rgba(19, 138, 85, 0.18);
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .topbar {
+          padding-top: max(8px, env(safe-area-inset-top));
+        }
+
+        .topbar-inner {
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 8px;
+        }
+
+        .brand {
+          gap: 9px;
+        }
+
+        .brand strong {
+          font-size: 0.94rem;
+        }
+
+        .brand span {
+          max-width: 190px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .topbar-actions {
+          justify-content: end;
+        }
+
+        .theme-toggle {
+          width: 44px;
+          min-width: 44px;
+          padding: 0;
+        }
+
+        .theme-toggle span {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+          white-space: nowrap;
+        }
+
+        .nav {
+          grid-column: 1 / -1;
+          gap: 4px;
+          padding: 4px;
+        }
+
+        .nav button {
+          min-height: 44px;
+          gap: 5px;
+          font-size: 0.78rem;
+        }
+
+        .app-shell {
+          padding-top: 10px;
+        }
+
+        .hero-panel {
+          min-height: 0;
+        }
+
+        .hero-media {
+          display: none;
+        }
+
+        .hero-copy {
+          padding: 18px;
+        }
+
+        .hero-copy h1 {
+          font-size: clamp(1.85rem, 10vw, 2.65rem);
+        }
+
+        .metric {
+          min-height: 104px;
+        }
+
+        .panel-header {
+          gap: 10px;
+        }
+
+        .form-section-title {
+          margin-top: 4px;
+          padding: 9px 10px;
+        }
+
+        #serviceForm .field {
+          padding: 10px;
+        }
+
+        #serviceForm input,
+        #serviceForm select,
+        #serviceForm textarea {
+          min-height: 48px;
+          font-size: 16px;
+        }
+
+        #serviceForm textarea {
+          min-height: 116px;
+        }
+
+        #serviceForm > .form-actions {
+          position: sticky;
+          bottom: max(10px, env(safe-area-inset-bottom));
+          z-index: 8;
+          margin: 16px -6px -6px;
+          padding: 10px;
+          background: rgba(8, 11, 16, 0.88);
+          border: 1px solid rgba(226, 235, 246, 0.12);
+          border-radius: 8px;
+          box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+          backdrop-filter: blur(14px);
+        }
+
+        html[data-theme="light"] #serviceForm > .form-actions {
+          background: rgba(255, 255, 255, 0.9);
+          border-color: rgba(15, 32, 48, 0.1);
+          box-shadow: 0 16px 32px rgba(15, 32, 48, 0.14);
+        }
+
+        .message-box {
+          min-height: 220px;
+        }
+      }
     </style>
   </head>
   <body>
+    <a class="skip-link" href="#dashboard">Ir para o conteúdo</a>
     <header class="topbar">
       <div class="topbar-inner">
         <div class="brand">
@@ -1553,7 +2415,12 @@
           </div>
         </div>
         <nav class="nav" aria-label="Navegação principal">
-          <button class="active" type="button" data-view-button="dashboard">
+          <button
+            class="active"
+            type="button"
+            data-view-button="dashboard"
+            aria-current="page"
+          >
             <i class="fa-solid fa-chart-line"></i> Painel
           </button>
           <button type="button" data-view-button="orcamento">
@@ -1563,6 +2430,18 @@
             <i class="fa-solid fa-screwdriver-wrench"></i> Serviços
           </button>
         </nav>
+        <div class="topbar-actions">
+          <button
+            class="theme-toggle"
+            type="button"
+            id="themeToggle"
+            aria-label="Alternar para tema claro"
+            aria-pressed="false"
+          >
+            <i class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span>Tema claro</span>
+          </button>
+        </div>
         <div class="sheet-pill" id="sheetPill" hidden>
           <i class="fa-solid fa-circle-nodes"></i
           ><span id="sheetStatus">Banco local</span>
@@ -1579,11 +2458,12 @@
         <div class="hero-panel">
           <div class="hero-copy">
             <div class="hero-kicker">
-              <span aria-hidden="true"></span> Painel NM Assistência
+              <span aria-hidden="true"></span> Operação NM Assistência
             </div>
-            <h1 id="dashboardTitle">Gestão técnica simples.</h1>
+            <h1 id="dashboardTitle">Controle técnico com visão de caixa.</h1>
             <p class="hero-lead">
-              Orçamentos, ordens de serviço e financeiro em um fluxo rápido.
+              Orçamentos, ordens de serviço, recebimentos e margem em uma rotina
+              direta para atendimento.
             </p>
             <div class="hero-tags" aria-label="Áreas atendidas">
               <span>Desktop</span>
@@ -1670,6 +2550,10 @@
 
             <input type="hidden" id="recordId" />
             <div class="form-grid">
+              <div class="form-section-title full">
+                <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+                <span>Dados do atendimento</span>
+              </div>
               <div class="field">
                 <label for="tipo">Tipo</label>
                 <select id="tipo">
@@ -1733,6 +2617,10 @@
                   placeholder="Carregador, controle, serial, senha..."
                 />
               </div>
+              <div class="form-section-title full">
+                <i class="fa-solid fa-microchip" aria-hidden="true"></i>
+                <span>Diagnóstico e serviço</span>
+              </div>
               <div class="field full">
                 <label for="problema">Problema relatado</label>
                 <textarea
@@ -1762,6 +2650,10 @@
                   id="pecas"
                   placeholder="Ex.: SSD 480GB, pasta térmica, cabo HDMI..."
                 ></textarea>
+              </div>
+              <div class="form-section-title full">
+                <i class="fa-solid fa-calculator" aria-hidden="true"></i>
+                <span>Valores</span>
               </div>
               <div class="field">
                 <label for="maoObra">Mão de obra cobrada</label>
@@ -1829,6 +2721,10 @@
                   value="0"
                 />
               </div>
+              <div class="form-section-title full">
+                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
+                <span>Entrega e controle</span>
+              </div>
               <div class="field">
                 <label for="garantia">Garantia</label>
                 <input id="garantia" placeholder="90 dias" />
@@ -1862,7 +2758,7 @@
               <button class="primary-button" type="submit">
                 <i class="fa-solid fa-floppy-disk"></i> Salvar
               </button>
-              <button class="ghost-button" type="submit" data-sync="true">
+              <button class="ghost-button" type="submit" data-sync="true" hidden>
                 <i class="fa-solid fa-cloud-arrow-up"></i> Salvar e sincronizar
               </button>
               <button class="ghost-button" type="button" id="newRecordButton">
@@ -2049,6 +2945,7 @@
       const STORAGE_KEYS = {
         records: "nmassistencia.records",
         settings: "nmassistencia.settings",
+        theme: "nmassistencia.theme",
       };
 
       const DEFAULT_SCRIPT_URL =
@@ -2603,10 +3500,13 @@
           view.classList.toggle("active", view.id === viewId),
         );
         $$("[data-view-button]").forEach((button) => {
-          button.classList.toggle(
-            "active",
-            button.dataset.viewButton === viewId,
-          );
+          const isActive = button.dataset.viewButton === viewId;
+          button.classList.toggle("active", isActive);
+          if (isActive) {
+            button.setAttribute("aria-current", "page");
+          } else {
+            button.removeAttribute("aria-current");
+          }
         });
         if (viewId === "orcamento") updateSummary();
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2630,6 +3530,34 @@
           () => toast.classList.remove("show"),
           3200,
         );
+      }
+
+      function getCurrentTheme() {
+        return document.documentElement.dataset.theme === "light"
+          ? "light"
+          : "dark";
+      }
+
+      function applyTheme(theme, shouldPersist = true) {
+        const nextTheme = theme === "light" ? "light" : "dark";
+        const isLight = nextTheme === "light";
+        document.documentElement.dataset.theme = nextTheme;
+        $("#themeToggle").setAttribute(
+          "aria-label",
+          isLight ? "Alternar para tema escuro" : "Alternar para tema claro",
+        );
+        $("#themeToggle").setAttribute("aria-pressed", String(isLight));
+        $("#themeToggle i").className = isLight
+          ? "fa-solid fa-moon"
+          : "fa-solid fa-sun";
+        $("#themeToggle span").textContent = isLight
+          ? "Tema escuro"
+          : "Tema claro";
+        $("#themeColorMeta").setAttribute(
+          "content",
+          isLight ? "#eef3f8" : "#05080e",
+        );
+        if (shouldPersist) localStorage.setItem(STORAGE_KEYS.theme, nextTheme);
       }
 
       function normalizePhone(phone) {
@@ -2950,6 +3878,10 @@
         $("#openWhatsApp").addEventListener("click", () =>
           openClientWhatsApp(),
         );
+        $("#themeToggle").addEventListener("click", () => {
+          const nextTheme = getCurrentTheme() === "light" ? "dark" : "light";
+          applyTheme(nextTheme);
+        });
         $("#exportButton").addEventListener("click", exportCsv);
 
         $("#searchRecords").addEventListener("input", renderRecords);
@@ -2997,6 +3929,7 @@
       }
 
       function init() {
+        applyTheme(getCurrentTheme(), false);
         fillForm(null);
         setupEvents();
         renderAll();
