@@ -2948,6 +2948,8 @@
         theme: "nmassistencia.theme",
       };
 
+      const AUTO_SYNC_INTERVAL = 5000;
+
       const DEFAULT_SCRIPT_URL =
         "https://script.google.com/macros/s/AKfycbyuvf6unW50_c7UrRFp7GieWK1lpHSGxUBjktG8CXG6jmwTSrJi5mEOMWfRkPOExx6W/exec";
 
@@ -3003,6 +3005,8 @@
       const state = {
         records: loadJson(STORAGE_KEYS.records, []),
         settings: normalizeSettings(loadJson(STORAGE_KEYS.settings, {})),
+        autoSyncTimer: null,
+        isSyncing: false,
         toastTimer: null,
       };
 
@@ -3610,6 +3614,7 @@
           pendingSync: true,
         };
         upsertRecord(copy);
+        autoSyncRecords();
         showToast("Registro duplicado.");
       }
 
@@ -3757,6 +3762,78 @@
         }
       }
 
+      function mergeSheetRecords(incoming) {
+        const byId = new Map(state.records.map((record) => [record.id, record]));
+
+        incoming.forEach((record) => {
+          const current = byId.get(record.id);
+          if (
+            current?.pendingSync &&
+            String(current.updatedAt || "").localeCompare(
+              String(record.updatedAt || ""),
+            ) > 0
+          ) {
+            return;
+          }
+
+          if (
+            !current ||
+            String(record.updatedAt || "").localeCompare(
+              String(current.updatedAt || ""),
+            ) >= 0
+          ) {
+            byId.set(record.id, {
+              ...current,
+              ...record,
+              pendingSync: false,
+            });
+          }
+        });
+
+        state.records = Array.from(byId.values()).sort((a, b) =>
+          String(b.updatedAt).localeCompare(String(a.updatedAt)),
+        );
+      }
+
+      async function autoSyncRecords() {
+        if (!getScriptUrl() || state.isSyncing) return;
+        state.isSyncing = true;
+
+        try {
+          const pending = state.records.filter((record) => record.pendingSync);
+          if (pending.length) {
+            await postToSheets("batchUpsert", pending.map(stripLocalFields));
+            const sentIds = new Set(pending.map((record) => record.id));
+            state.records = state.records.map((record) =>
+              sentIds.has(record.id) ? { ...record, pendingSync: false } : record,
+            );
+          }
+
+          const result = await sheetsJsonp("list");
+          if (!result?.ok)
+            throw new Error(result?.error || "Resposta inválida.");
+
+          const incoming = Array.isArray(result.records)
+            ? result.records.map(normalizeRecord)
+            : [];
+          mergeSheetRecords(incoming);
+          state.settings.lastSync = new Date().toISOString();
+          saveRecords();
+          saveSettings();
+          renderAll();
+        } catch (error) {
+          console.warn("Sincronização automática falhou:", error);
+        } finally {
+          state.isSyncing = false;
+        }
+      }
+
+      function startAutoSync() {
+        if (state.autoSyncTimer || !getScriptUrl()) return;
+        autoSyncRecords();
+        state.autoSyncTimer = setInterval(autoSyncRecords, AUTO_SYNC_INTERVAL);
+      }
+
       async function syncSingle(record) {
         if (!getScriptUrl()) return;
         await postToSheets("upsert", stripLocalFields(record));
@@ -3777,29 +3854,7 @@
           const incoming = Array.isArray(result.records)
             ? result.records.map(normalizeRecord)
             : [];
-          const byId = new Map(
-            state.records.map((record) => [record.id, record]),
-          );
-
-          incoming.forEach((record) => {
-            const current = byId.get(record.id);
-            if (
-              !current ||
-              String(record.updatedAt || "").localeCompare(
-                String(current.updatedAt || ""),
-              ) >= 0
-            ) {
-              byId.set(record.id, {
-                ...current,
-                ...record,
-                pendingSync: false,
-              });
-            }
-          });
-
-          state.records = Array.from(byId.values()).sort((a, b) =>
-            String(b.updatedAt).localeCompare(String(a.updatedAt)),
-          );
+          mergeSheetRecords(incoming);
           state.settings.lastSync = new Date().toISOString();
           saveRecords();
           saveSettings();
@@ -3855,6 +3910,7 @@
           const record = buildRecordFromForm();
           upsertRecord(record);
           fillForm(record);
+          autoSyncRecords();
           showToast("Registro salvo.");
 
           if (event.submitter?.dataset.sync === "true") {
@@ -3934,6 +3990,7 @@
         setupEvents();
         renderAll();
         updateSummary();
+        startAutoSync();
       }
 
       init();
